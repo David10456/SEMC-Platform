@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Qt
-
+from src.semc.ui.pages.dashboard import DashboardPage
 
 class SEMCMainWindow(QMainWindow):
 
@@ -130,13 +130,7 @@ class SEMCMainWindow(QMainWindow):
         )
 
 
-        self.workspace = QLabel(
-            "Dashboard Workspace"
-        )
-
-        self.workspace.setAlignment(
-            Qt.AlignCenter
-        )
+        self.workspace = DashboardPage()
 
 
         self.navigation.currentRowChanged.connect(
@@ -154,12 +148,21 @@ class SEMCMainWindow(QMainWindow):
 
 
     def change_workspace(self, index):
-
         name = self.navigation.item(index).text()
-
-        self.workspace.setText(
-            f"{name}\n\nModule Ready"
+        self.workspace.deleteLater()
+        if name == "Dashboard":
+            self.workspace = DashboardPage()
+        else:
+            self.workspace = QLabel(
+                f"{name}\n\nModule Under Development"
         )
+
+        self.workspace.setAlignment(
+            Qt.AlignCenter
+        )
+        self.centralWidget().layout().addWidget(
+        self.workspace
+    )
 
 
     def create_status(self):
