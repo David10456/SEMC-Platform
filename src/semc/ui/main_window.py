@@ -3,16 +3,17 @@ from PySide6.QtWidgets import (
     QWidget,
     QLabel,
     QHBoxLayout,
-    QVBoxLayout,
     QListWidget,
     QStatusBar,
     QMenuBar,
-    QToolBar,
-    QMessageBox
+    QToolBar
 )
 
 from PySide6.QtCore import Qt
+
 from src.semc.ui.pages.dashboard import DashboardPage
+from src.semc.ui.workspace import WorkspaceManager
+
 
 class SEMCMainWindow(QMainWindow):
 
@@ -42,25 +43,12 @@ class SEMCMainWindow(QMainWindow):
 
         menu = self.menuBar()
 
-        file_menu = menu.addMenu("File")
-
-        project_menu = menu.addMenu("Project")
-
-        controller_menu = menu.addMenu(
-            "Controller"
-        )
-
-        simulation_menu = menu.addMenu(
-            "Simulation"
-        )
-
-        tools_menu = menu.addMenu(
-            "Tools"
-        )
-
-        help_menu = menu.addMenu(
-            "Help"
-        )
+        menu.addMenu("File")
+        menu.addMenu("Project")
+        menu.addMenu("Controller")
+        menu.addMenu("Simulation")
+        menu.addMenu("Tools")
+        menu.addMenu("Help")
 
 
     def create_toolbar(self):
@@ -70,7 +58,6 @@ class SEMCMainWindow(QMainWindow):
         self.addToolBar(
             toolbar
         )
-
 
         toolbar.addAction(
             "▶ Start"
@@ -105,23 +92,28 @@ class SEMCMainWindow(QMainWindow):
         )
 
 
+        # Navigation panel
+
         self.navigation = QListWidget()
 
 
+        pages = [
+            "Dashboard",
+            "Media Library",
+            "Playlist Manager",
+            "Display Designer",
+            "Controller Explorer",
+            "Communication",
+            "Virtual LED Wall",
+            "Performance",
+            "Diagnostics",
+            "Developer Console",
+            "Settings"
+        ]
+
+
         self.navigation.addItems(
-            [
-                "Dashboard",
-                "Media Library",
-                "Playlist Manager",
-                "Display Designer",
-                "Controller Explorer",
-                "Communication",
-                "Virtual LED Wall",
-                "Performance",
-                "Diagnostics",
-                "Developer Console",
-                "Settings"
-            ]
+            pages
         )
 
 
@@ -130,8 +122,40 @@ class SEMCMainWindow(QMainWindow):
         )
 
 
-        self.workspace = DashboardPage()
+        # Workspace manager
 
+        self.workspace = WorkspaceManager()
+
+
+        # Dashboard page
+
+        self.workspace.add_page(
+            "Dashboard",
+            DashboardPage()
+        )
+
+
+        # Placeholder pages
+
+        for page in pages:
+
+            if page != "Dashboard":
+
+                placeholder = QLabel(
+                    f"{page}\n\nModule Under Development"
+                )
+
+                placeholder.setAlignment(
+                    Qt.AlignCenter
+                )
+
+                self.workspace.add_page(
+                    page,
+                    placeholder
+                )
+
+
+        # Navigation event
 
         self.navigation.currentRowChanged.connect(
             self.change_workspace
@@ -148,21 +172,12 @@ class SEMCMainWindow(QMainWindow):
 
 
     def change_workspace(self, index):
-        name = self.navigation.item(index).text()
-        self.workspace.deleteLater()
-        if name == "Dashboard":
-            self.workspace = DashboardPage()
-        else:
-            self.workspace = QLabel(
-                f"{name}\n\nModule Under Development"
-        )
 
-        self.workspace.setAlignment(
-            Qt.AlignCenter
+        name = self.navigation.item(index).text()
+
+        self.workspace.show_page(
+            name
         )
-        self.centralWidget().layout().addWidget(
-        self.workspace
-    )
 
 
     def create_status(self):
@@ -172,6 +187,7 @@ class SEMCMainWindow(QMainWindow):
         self.setStatusBar(
             status
         )
+
 
         status.showMessage(
             "System Ready | Controller Offline | Simulation Stopped"
