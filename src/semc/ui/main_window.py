@@ -5,7 +5,10 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QVBoxLayout,
     QListWidget,
-    QStatusBar
+    QStatusBar,
+    QMenuBar,
+    QToolBar,
+    QMessageBox
 )
 
 from PySide6.QtCore import Qt
@@ -14,6 +17,7 @@ from PySide6.QtCore import Qt
 class SEMCMainWindow(QMainWindow):
 
     def __init__(self):
+
         super().__init__()
 
         self.setWindowTitle(
@@ -25,29 +29,84 @@ class SEMCMainWindow(QMainWindow):
             800
         )
 
+        self.create_menu()
+
+        self.create_toolbar()
+
         self.create_ui()
+
+        self.create_status()
+
+
+    def create_menu(self):
+
+        menu = self.menuBar()
+
+        file_menu = menu.addMenu("File")
+
+        project_menu = menu.addMenu("Project")
+
+        controller_menu = menu.addMenu(
+            "Controller"
+        )
+
+        simulation_menu = menu.addMenu(
+            "Simulation"
+        )
+
+        tools_menu = menu.addMenu(
+            "Tools"
+        )
+
+        help_menu = menu.addMenu(
+            "Help"
+        )
+
+
+    def create_toolbar(self):
+
+        toolbar = QToolBar()
+
+        self.addToolBar(
+            toolbar
+        )
+
+
+        toolbar.addAction(
+            "▶ Start"
+        )
+
+        toolbar.addAction(
+            "⏸ Pause"
+        )
+
+        toolbar.addAction(
+            "⏹ Stop"
+        )
+
+        toolbar.addAction(
+            "⚙ Settings"
+        )
 
 
     def create_ui(self):
 
-        # Main container
-        central_widget = QWidget()
+        central = QWidget()
 
         self.setCentralWidget(
-            central_widget
+            central
         )
 
 
-        # Main layout
-        main_layout = QHBoxLayout()
+        layout = QHBoxLayout()
 
-        central_widget.setLayout(
-            main_layout
+        central.setLayout(
+            layout
         )
 
 
-        # Navigation panel
         self.navigation = QListWidget()
+
 
         self.navigation.addItems(
             [
@@ -67,61 +126,50 @@ class SEMCMainWindow(QMainWindow):
 
 
         self.navigation.setFixedWidth(
-            220
+            240
         )
 
 
-        # Workspace
-        workspace = QWidget()
-
-        workspace_layout = QVBoxLayout()
-
-        workspace.setLayout(
-            workspace_layout
+        self.workspace = QLabel(
+            "Dashboard Workspace"
         )
 
-
-        title = QLabel(
-            "Welcome to SEMC Studio"
-        )
-
-        title.setAlignment(
+        self.workspace.setAlignment(
             Qt.AlignCenter
         )
 
 
-        subtitle = QLabel(
-            "Standalone Embedded Multimedia Controller\nDigital Twin Environment"
-        )
-
-        subtitle.setAlignment(
-            Qt.AlignCenter
+        self.navigation.currentRowChanged.connect(
+            self.change_workspace
         )
 
 
-        workspace_layout.addWidget(
-            title
-        )
-
-        workspace_layout.addWidget(
-            subtitle
-        )
-
-
-        main_layout.addWidget(
+        layout.addWidget(
             self.navigation
         )
 
-        main_layout.addWidget(
-            workspace
+        layout.addWidget(
+            self.workspace
         )
 
 
-        # Status bar
+    def change_workspace(self, index):
+
+        name = self.navigation.item(index).text()
+
+        self.workspace.setText(
+            f"{name}\n\nModule Ready"
+        )
+
+
+    def create_status(self):
+
+        status = QStatusBar()
+
         self.setStatusBar(
-            QStatusBar()
+            status
         )
 
-        self.statusBar().showMessage(
-            "System Ready | Simulation Offline"
+        status.showMessage(
+            "System Ready | Controller Offline | Simulation Stopped"
         )
