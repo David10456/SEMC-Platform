@@ -5,13 +5,13 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QListWidget,
     QStatusBar,
-    QMenuBar,
     QToolBar
 )
 
 from PySide6.QtCore import Qt
 
 from src.semc.ui.pages.dashboard import DashboardPage
+from src.semc.ui.pages.media_library import MediaLibraryPage
 from src.semc.ui.workspace import WorkspaceManager
 
 
@@ -31,11 +31,8 @@ class SEMCMainWindow(QMainWindow):
         )
 
         self.create_menu()
-
         self.create_toolbar()
-
         self.create_ui()
-
         self.create_status()
 
 
@@ -55,25 +52,12 @@ class SEMCMainWindow(QMainWindow):
 
         toolbar = QToolBar()
 
-        self.addToolBar(
-            toolbar
-        )
+        self.addToolBar(toolbar)
 
-        toolbar.addAction(
-            "▶ Start"
-        )
-
-        toolbar.addAction(
-            "⏸ Pause"
-        )
-
-        toolbar.addAction(
-            "⏹ Stop"
-        )
-
-        toolbar.addAction(
-            "⚙ Settings"
-        )
+        toolbar.addAction("▶ Start")
+        toolbar.addAction("⏸ Pause")
+        toolbar.addAction("⏹ Stop")
+        toolbar.addAction("⚙ Settings")
 
 
     def create_ui(self):
@@ -84,7 +68,6 @@ class SEMCMainWindow(QMainWindow):
             central
         )
 
-
         layout = QHBoxLayout()
 
         central.setLayout(
@@ -92,10 +75,9 @@ class SEMCMainWindow(QMainWindow):
         )
 
 
-        # Navigation panel
+        # Navigation
 
         self.navigation = QListWidget()
-
 
         pages = [
             "Dashboard",
@@ -111,23 +93,19 @@ class SEMCMainWindow(QMainWindow):
             "Settings"
         ]
 
-
-        self.navigation.addItems(
-            pages
-        )
-
+        self.navigation.addItems(pages)
 
         self.navigation.setFixedWidth(
             240
         )
 
 
-        # Workspace manager
+        # Workspace
 
         self.workspace = WorkspaceManager()
 
 
-        # Dashboard page
+        # Dashboard
 
         self.workspace.add_page(
             "Dashboard",
@@ -135,31 +113,51 @@ class SEMCMainWindow(QMainWindow):
         )
 
 
+        # Media Library
+
+        self.workspace.add_page(
+            "Media Library",
+            MediaLibraryPage()
+        )
+
+
         # Placeholder pages
 
-        for page in pages:
-
-            if page != "Dashboard":
-
-                placeholder = QLabel(
-                    f"{page}\n\nModule Under Development"
-                )
-
-                placeholder.setAlignment(
-                    Qt.AlignCenter
-                )
-
-                self.workspace.add_page(
-                    page,
-                    placeholder
-                )
+        placeholder_pages = [
+            "Playlist Manager",
+            "Display Designer",
+            "Controller Explorer",
+            "Communication",
+            "Virtual LED Wall",
+            "Performance",
+            "Diagnostics",
+            "Developer Console",
+            "Settings"
+        ]
 
 
-        # Navigation event
+        for page in placeholder_pages:
+
+            placeholder = QLabel(
+                f"{page}\n\nModule Under Development"
+            )
+
+            placeholder.setAlignment(
+                Qt.AlignCenter
+            )
+
+            self.workspace.add_page(
+                page,
+                placeholder
+            )
+
 
         self.navigation.currentRowChanged.connect(
             self.change_workspace
         )
+
+
+        self.navigation.setCurrentRow(0)
 
 
         layout.addWidget(
@@ -187,7 +185,6 @@ class SEMCMainWindow(QMainWindow):
         self.setStatusBar(
             status
         )
-
 
         status.showMessage(
             "System Ready | Controller Offline | Simulation Stopped"
