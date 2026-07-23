@@ -14,6 +14,12 @@ class MediaController:
 
         self.storage = StorageManager()
 
+        self.model = Media
+
+
+    # ==========================================
+    # Import Media
+    # ==========================================
 
     def import_media(self, file_path):
 
@@ -22,7 +28,6 @@ class MediaController:
         extension = os.path.splitext(
             filename
         )[1].lower()
-
 
         if extension in [
             ".png",
@@ -33,7 +38,6 @@ class MediaController:
 
             media_type = "image"
 
-
         elif extension in [
             ".mp4",
             ".avi",
@@ -42,19 +46,16 @@ class MediaController:
 
             media_type = "video"
 
-
         else:
 
             raise ValueError(
                 "Unsupported file type"
             )
 
-
         saved_path = self.storage.save_file(
             file_path,
             media_type
         )
-
 
         media = Media(
             filename=filename,
@@ -62,12 +63,22 @@ class MediaController:
             media_type=media_type
         )
 
-
-        self.session.add(
-            media
-        )
+        self.session.add(media)
 
         self.session.commit()
 
-
         return media
+
+
+    # ==========================================
+    # Load All Media
+    # ==========================================
+
+    def get_all_media(self):
+
+        return (
+            self.session
+            .query(self.model)
+            .order_by(self.model.id)
+            .all()
+        )
